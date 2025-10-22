@@ -1,0 +1,43 @@
+# --- Python cache ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+
+# --- Virtual environment ---
+venv/
+.venv/
+env/
+ENV/
+.env
+.envrc
+
+# --- Jupyter notebooks ---
+.ipynb_checkpoints/
+
+# --- Logs and outputs ---
+logs/
+runs/
+outputs/
+checkpoints/
+*.log
+
+# --- Data and models ---
+data/
+datasets/
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.npy
+*.npz
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- System files ---
+.DS_Store
+Thumbs.db
