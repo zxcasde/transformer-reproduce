@@ -1,9 +1,9 @@
 
-## Getting Started
+# Getting Started
 Clone repo:
 ``` bash
-git clone git@github.com:facebookresearch/coconut.git
-cd coconut
+git clone git@github.com:zxcasde/transformer-reproduce.git
+cd transformer-reproduce
 ```
 
 # Quick Start
