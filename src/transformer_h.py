@@ -28,7 +28,7 @@ class Positional_Encoding(nn.Module):
     def forward(self, x):
         # (batch_size, seq_len, hidden_dim)
         seq_len = x.shape[1]
-        x = x + self.pe[:, seq_len, :]
+        x = x + self.pe[:, :seq_len, :]
         return x
 
 class ScaledDotproductAttention(nn.Module):
@@ -45,7 +45,8 @@ class ScaledDotproductAttention(nn.Module):
         scores = torch.matmul(q, k.transpose(2, 3)) / (d_k ** 0.5)
         
         if mask is not None:
-            scores = scores.masked_fill(mask==0, float('-inf'))
+            # float('-inf')): nan
+            scores = scores.masked_fill(mask==0, -1e9)
         
         attn = F.softmax(scores, dim=-1)
 
@@ -148,11 +149,11 @@ class Encoder(nn.Module):
 
         self.last_norm = nn.LayerNorm(d_model)
 
-    def forward(self, x):
+    def forward(self, x, mask=None):
         embed_x = self.src_emb(x)
         x_layer = self.pos_encode(embed_x)
         for layer in self.layers:
-            x_layer = layer(x_layer)
+            x_layer = layer(x_layer, mask)
         
         return self.last_norm(x_layer)
     
@@ -177,7 +178,7 @@ class DecoderLayer(nn.Module):
         output2 = self.add_norm2(output1, cross_attn_out)
 
         ffn_out = self.ffn(output2)
-        output3 = self.add_norm3(output3, ffn_out)
+        output3 = self.add_norm3(output2, ffn_out)
 
         return output3
 
@@ -194,23 +195,53 @@ class Decoder(nn.Module):
 
         self.last_norm = nn.LayerNorm(d_model)
 
-    def forward(self, tgt, encoder_output, tgt_mask=None, momery_mask=None):
+    def forward(self, tgt, encoder_output, tgt_mask=None, memory_mask=None):
         embed_tgt = self.embed(tgt)
         tgt_layer = self.pos_embed(embed_tgt)
 
         for layer in self.layers:
-            tgt_layer = layer(tgt_layer, encoder_output, tgt_mask, momery_mask)
+            tgt_layer = layer(tgt_layer, encoder_output, tgt_mask, memory_mask)
         
         return self.last_norm(tgt_layer)
 
-class Transformer(nn.Module):
+class Encoder_Only_Transformer(nn.Module):
+    def __init__(self, src_vocab, num_classes, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1):
+        super(Encoder_Only_Transformer, self).__init__()
+
+        self.encoder = Encoder(src_vocab, d_model, n_heads, d_ff, num_layers, dropout)
+
+        self.fc = nn.Linear(d_model, num_classes)
+
+        self._init_parameters()
+
+    def _init_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+
+    def forward(self, src, src_mask):
+        output = self.encoder(src, src_mask)
+        # 取 [CLS] token
+        out = self.fc(output[:, 0, :])
+
+        return out
+
+
+class Encoder_Decoder_Transformer(nn.Module):
     def __init__(self, src_vocab, tgt_vocab, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1):
-        super(Transformer, self).__init__()
+        super(Encoder_Decoder_Transformer, self).__init__()
 
         self.encoder = Encoder(src_vocab, d_model, n_heads, d_ff, num_layers, dropout)
         self.decoder = Decoder(tgt_vocab, d_model, n_heads, d_ff, num_layers, dropout)
 
         self.output_linear = nn.Linear(d_model, tgt_vocab)
+
+        self._init_parameters()
+
+    def _init_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
 
     def forward(self, src, tgt, src_mask=None, tgt_mask=None, memory_mask=None):
         encoder_output = self.encoder(src, src_mask)

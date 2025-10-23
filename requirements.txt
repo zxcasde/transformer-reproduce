@@ -2,6 +2,7 @@
 
 # === 核心框架 ===
 torch>=2.0.1
+tokenizers
 # torchvision>=0.15.2
 # transformers>=4.30.0
 
@@ -22,7 +23,7 @@ pyyaml>=6.0
 # omegaconf>=2.3.0
 
 # === 可视化 ===
-# matplotlib>=3.7.0
+matplotlib>=3.7.0
 # seaborn>=0.12.0
 # wandb>=0.15.0
 
