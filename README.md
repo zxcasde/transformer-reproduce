@@ -20,9 +20,13 @@ conda activate transformer
 ## 3. Huggingface 准备数据，或直接从本地加载
 数据集原始链接：
 https://huggingface.co/datasets/Salesforce/wikitext
+
 https://huggingface.co/datasets/fancyzhx/ag_news
+
 https://huggingface.co/datasets/IWSLT/iwslt2017
+
 提供两种方式，huggingface加载速度比本地加载更快，默认huggingface加载，请运行以下下载脚本
+
 ```python download.py```
 
 ## 4. 训练分词器:
