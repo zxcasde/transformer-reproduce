@@ -9,7 +9,7 @@ max_len: 128
 d_model: 512
 n_heads: 8
 d_ff: 2048
-num_layers: 6
+num_layers: 4
 dropout: 0.1
 
 # 优化器与学习率
