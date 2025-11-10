@@ -19,6 +19,7 @@ conda activate transformer
 
 ## 3. Huggingface 准备数据，或直接从本地加载
 数据集原始链接：
+
 https://huggingface.co/datasets/Salesforce/wikitext
 
 https://huggingface.co/datasets/fancyzhx/ag_news
@@ -34,10 +35,30 @@ https://huggingface.co/datasets/IWSLT/iwslt2017
 bash scripts/tokenizer.sh
 ```
 
+## 5.Encoder-Only架构实验
+WikiText数据集上进行 MLM 预训练
+``` 
+bash scripts/run_pretrain.sh
+```
 
-## 5.
+Ag news数据集上进行微调
+``` 
+bash scripts/run_finetune.sh
+```
+## 6. Encoder-Decoder架构实验
+IWSLT数据集上en-de翻译实验
+``` 
+bash scripts/run_translate.sh
+```
 
-## 6.
+## 7. 目录说明
+运行下载数据脚本，数据保存在 ./data 目录下
+
+本地数据保存在 ./datasets 目录下
+
+运行保存的模型在 ./save/model 目录下
+
+运行结果保存在 ./results 目录下
 
 # 环境与硬件配置
 本项目基于 PyTorch 复现 Transformer 模型，推荐硬件与环境如下：
