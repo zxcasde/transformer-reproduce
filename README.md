@@ -63,9 +63,9 @@ python src/pos_emb_ablation.py
 ```
 上述四个命令分别代表对FFN层维度、注意力头数、Transformer层数的对比实验以及位置编码的对比实验
 
-标准Tranformer实现见transformer.h
+标准Tranformer实现见 src/transformer.h
 
-不同位置编码的transformer实现见transformer_pos.h
+不同位置编码的Transformer实现见 src/transformer_pos.h
 
 所有脚本均已经设置了随机种子42
 
