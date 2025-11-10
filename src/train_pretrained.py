@@ -413,7 +413,7 @@ def load_config(config_path: str):
     return config
 
 # ============================ 主训练函数修改 ============================
-def main_with_scheduler(config_path='./config/config.yaml', load_local=False):
+def main_with_scheduler(config_path='./configs/config.yaml', load_local=False):
     from transformer_h import Encoder_Only_MLM
     
     # 读取配置

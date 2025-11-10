@@ -17,6 +17,6 @@ mkdir -p "$PROJECT_ROOT/results/MLM"
 
 # 运行脚本
 echo "🚀 启动 MLM 训练 ..."
-python "$SRC_DIR/mlm_pretraining.py" --config "$CONFIG_DIR/pretrain.yaml"
+python "$SRC_DIR/train_pretrained.py" --config "$CONFIG_DIR/pretrain.yaml"
 
 echo "✅ 训练完成！结果保存在 ./save/ 和 ./results/ 下。"
