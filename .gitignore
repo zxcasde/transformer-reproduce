@@ -26,7 +26,6 @@ checkpoints/
 data/
 models/
 models_new/
-datasets/
 *.pt
 *.pth
 *.ckpt
