@@ -1,0 +1,31 @@
+experiment_name: "iwslt_seq2seq_transformer"
+
+# 数据集设置
+dataset_dir: "./datasets"
+load_with_local_json: false  # 若使用本地 JSON, 改成 true
+max_len: 128
+
+# 模型参数
+d_model: 512
+n_heads: 8
+d_ff: 2048
+num_layers: 6
+dropout: 0.1
+
+# 优化器与学习率
+base_lr: 1.0
+weight_decay: 0.01
+
+# 训练参数
+batch_size: 128
+test_batch_size: 512
+epochs: 50
+device: "cuda:0"
+seed: 42
+
+# 输出路径
+model_save_dir: "./save/model/seq2seq"
+results_save_dir: "./results/seq2seq"
+
+# 测试样例
+test_sentence: "I love deep learning."

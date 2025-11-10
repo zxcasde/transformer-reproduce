@@ -1,13 +1,16 @@
 {
     "experiment_name": "mlm_pretraining",
+    "dataset_name": "wikitext",
     "d_model": 128,
     "n_heads": 4,
     "d_ff": 512,
     "num_layers": 2,
     "batch_size": 128,
     "epochs": 30,
-    "learning_rate": 0.01,
+    "learning_rate": 0.001,
     "warmup_steps": 1000,
     "max_length": 128,
-    "mlm_prob": 0.15
+    "mlm_prob": 0.15,
+    "device": "cuda:0",
+    "seed": 42
 }

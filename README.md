@@ -50,8 +50,26 @@ IWSLT数据集上en-de翻译实验
 ``` 
 bash scripts/run_translate.sh
 ```
+即可完成训练+评估过程
 
-## 7. 目录说明
+如若想进一步测试生成质量，可运行generate.py脚本，该脚本需要传入模型路径和保存结果路径
+
+## 7.对比消融实验
+``` 
+python src/exp_ffn.py
+python src/exp_head.py
+python src/exp_layer.py
+python src/pos_emb_ablation.py
+```
+上述四个命令分别代表对FFN层维度、注意力头数、Transformer层数的对比实验以及位置编码的对比实验
+
+标准Tranformer实现见transformer.h
+
+不同位置编码的transformer实现见transformer_pos.h
+
+所有脚本均已经设置了随机种子42
+
+## 8. 目录说明
 运行下载数据脚本，数据保存在 ./data 目录下
 
 本地数据保存在 ./datasets 目录下

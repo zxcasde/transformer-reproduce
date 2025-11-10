@@ -15,6 +15,8 @@ from torch.optim.lr_scheduler import LambdaLR
 import random
 import numpy as np
 import seaborn as sns
+import yaml
+import argparse
 
 def set_seed(seed=42):
     random.seed(seed)
@@ -433,53 +435,91 @@ def plot_learning_rate_schedule(history_dict, save_path=None, show=False):
     else:
         plt.close()
 
-def main():
-    set_seed(42)
+def load_config(config_path: str):
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    print(f"✅ 配置文件已加载: {config_path}")
+    return config
 
-    tokenizer_src, tokenizer_tgt, corpus_src_train, corpus_tgt_train, corpus_src_test, corpus_tgt_test = get_tokenizer_data()
-    dataset_train = TranslationDataset(corpus_src_train, corpus_tgt_train, tokenizer_src, tokenizer_tgt)
-    trainloader = DataLoader(dataset_train, batch_size=128, shuffle=True)
-    dataset_test = TranslationDataset(corpus_src_test, corpus_tgt_test, tokenizer_src, tokenizer_tgt)
-    testloader = DataLoader(dataset_test, batch_size=512, shuffle=False)
-    print(len(dataset_train), len(dataset_test))
-    print(tokenizer_src.get_vocab_size(), tokenizer_tgt.get_vocab_size())
-    device = "cuda:0"
+# ===============================================================
+# 主函数（带配置）
+# ===============================================================
+def main_with_config(config_path="./config/seq2seq_config.yaml"):
+    # 读取配置
+    cfg = load_config(config_path)
+    set_seed(cfg.get("seed", 42))
+
+    # === 数据加载 ===
+    tokenizer_src, tokenizer_tgt, src_train, tgt_train, src_test, tgt_test = get_tokenizer_data(
+        dir_path=cfg["dataset_dir"],
+        load_with_local_json=cfg.get("load_with_local_json", False)
+    )
+
+    dataset_train = TranslationDataset(src_train, tgt_train, tokenizer_src, tokenizer_tgt, max_len=cfg["max_len"])
+    dataset_test = TranslationDataset(src_test, tgt_test, tokenizer_src, tokenizer_tgt, max_len=cfg["max_len"])
+
+    trainloader = DataLoader(dataset_train, batch_size=cfg["batch_size"], shuffle=True)
+    testloader = DataLoader(dataset_test, batch_size=cfg["test_batch_size"], shuffle=False)
+
+    print(f"📘 Train size: {len(dataset_train)}, Test size: {len(dataset_test)}")
+    print(f"🧠 Vocab (src/tgt): {tokenizer_src.get_vocab_size()} / {tokenizer_tgt.get_vocab_size()}")
+
+    # === 模型初始化 ===
+    device = cfg["device"]
     model = Encoder_Decoder_Transformer(
         src_vocab=tokenizer_src.get_vocab_size(),
         tgt_vocab=tokenizer_tgt.get_vocab_size(),
-        d_model=512,
-        n_heads=8,
-        d_ff=2048,
-        num_layers=6,
-        dropout=0.1
+        d_model=cfg["d_model"],
+        n_heads=cfg["n_heads"],
+        d_ff=cfg["d_ff"],
+        num_layers=cfg["num_layers"],
+        dropout=cfg["dropout"]
     ).to(device)
-    
+
     criterion = torch.nn.CrossEntropyLoss(ignore_index=tokenizer_tgt.token_to_id("<pad>"))
-    param_groups = get_param_groups(model, weight_decay=0.01)
-    optimizer = AdamW(param_groups, lr=1.0, betas=(0.9, 0.98), eps=1e-9)
+    param_groups = get_param_groups(model, weight_decay=cfg["weight_decay"])
+    optimizer = AdamW(param_groups, lr=cfg["base_lr"], betas=(0.9, 0.98), eps=1e-9)
 
-    scheduler = torch.optim.lr_scheduler.LambdaLR(
-        optimizer, lr_lambda=lambda step: transformer_lr(step, d_model=512)
+    scheduler = LambdaLR(optimizer, lr_lambda=lambda step: transformer_lr(step, cfg["d_model"]))
+
+    print(f"🚀 开始训练: {cfg['experiment_name']}")
+    history = train_model(
+        model=model,
+        trainloader=trainloader,
+        testloader=testloader,
+        tokenizer_src=tokenizer_src,
+        tokenizer_tgt=tokenizer_tgt,
+        criterion=criterion,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        device=device,
+        epochs=cfg["epochs"],
+        model_save_dir=cfg["model_save_dir"],
+        results_save_dir=cfg["results_save_dir"]
     )
-    history = train_model(model, trainloader, testloader, tokenizer_src, tokenizer_tgt, criterion, optimizer, scheduler, device, 50)
 
+    # === 绘图 ===
     plot_batch_loss(
         history_dict=history,
-        save_path=os.path.join("./results/seq_to_seq", 'batch_loss.png'),
+        save_path=os.path.join(cfg["results_save_dir"], 'batch_loss.png'),
         smoothing=0.95
     )
 
     plot_learning_rate_schedule(
         history_dict=history,
-        save_path=os.path.join("./results/seq_to_seq", 'batch_lr.png'),
+        save_path=os.path.join(cfg["results_save_dir"], 'batch_lr.png'),
     )
 
-    res = generate_text(model, "I love deep learning.", tokenizer_src, tokenizer_tgt, device)
+    # === 测试样例生成 ===
+    test_text = cfg.get("test_sentence", "I love deep learning.")
+    result = generate_text(model, test_text, tokenizer_src, tokenizer_tgt, device)
+    print(f"\n🧩 示例输入: {test_text}\n🔤 模型输出: {result}")
 
-    print(res)
-    # 输出：
-    # ==> "Ich liebe tiefes Lernen"
-
-
-if __name__== '__main__':
-    main()
+# ===============================================================
+# CLI 入口
+# ===============================================================
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train Transformer Seq2Seq model with config file")
+    parser.add_argument("--config", type=str, default="./config/seq2seq_config.yaml", help="Path to YAML config")
+    args = parser.parse_args()
+    main_with_config(args.config)

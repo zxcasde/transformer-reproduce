@@ -12,6 +12,8 @@ from tokenizers import Tokenizer
 import seaborn as sns
 import numpy as np
 from pathlib import Path
+import random
+import yaml
 
 def get_tokenizer(datasets_name):
     tokenizer_src = Tokenizer.from_file(f"./datasets/tokenizer/{datasets_name}_tokenizer.json")
@@ -522,79 +524,127 @@ def evaluate_model(model, data_loader, tokenizer, criterion, device):
     
     return avg_loss, accuracy
 
-def main():
-    # 加载tokenizer和数据
-    tokenizer = get_tokenizer("ag_news")
-    (train_texts, train_labels), (test_texts, test_labels) = get_data(("ag_news", None))
-    
-    # 创建数据集
+def load_config(config_path: str):
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    print(f"✅ 配置文件已加载: {config_path}")
+    return config
+
+# -------- 固定随机种子 --------
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    print(f"[Seed fixed to {seed}]")
+
+# ===============================================================
+# 主函数 (支持外部配置)
+# ===============================================================
+def main_with_config(config_path="./configs/sft_config.yaml", load_local=False):
+    # 加载配置
+    config = load_config(config_path)
+
+    # 基本信息
+    dataset_name = config["dataset_name"]
+    device = torch.device(config["device"])
+    batch_size = config["batch_size"]
+    test_batch_size = config.get("test_batch_size", 32)
+    epochs = config["epochs"]
+    d_model = config["d_model"]
+    n_heads = config["n_heads"]
+    d_ff = config["d_ff"]
+    num_layers = config["num_layers"]
+    learning_rate = config["learning_rate"]
+    pretrained_path = config["pretrained_path"]
+    num_classes = config["num_classes"]
+    experiment_name = config.get("experiment_name", "sft_experiment")
+
+    # 加载 tokenizer 和数据
+    tokenizer = get_tokenizer(dataset_name)
+    (train_texts, train_labels), (test_texts, test_labels) = get_data((dataset_name, None), load_local)
+
+    # 数据集 & DataLoader
     train_dataset = ClassificationDataset(train_texts, train_labels, tokenizer)
     test_dataset = ClassificationDataset(test_texts, test_labels, tokenizer)
-    
-    # 创建数据加载器
-    train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-    
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=test_batch_size, shuffle=False)
+
     vocab_size = tokenizer.get_vocab_size()
-    print(f"Vocabulary size: {vocab_size}")
-    print(f"Number of classes: 4")  # AG News有4个类别
-    print(f"Train batches per epoch: {len(train_loader)}")
-    
-    # 设置设备
-    device = torch.device("cuda:7")
-    print(f"Using device: {device}")
-    
+    print(f"🧠 Vocab size: {vocab_size}, Num classes: {num_classes}")
+    print(f"Train samples: {len(train_dataset)}, Test samples: {len(test_dataset)}")
+
     add_safe_globals([Tokenizer])
 
-    pretrained = './save/model/MLM/best_model.pth'
-    ckpt = torch.load(pretrained, weights_only=False, map_location="cpu")
+    # 加载预训练 encoder
+    print(f"🔹 加载预训练权重: {pretrained_path}")
+    ckpt = torch.load(pretrained_path, weights_only=False, map_location="cpu")
     state = ckpt["model_state_dict"] if "model_state_dict" in ckpt else ckpt
 
-    encoder = Encoder(vocab_size=vocab_size, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1)
+    encoder = Encoder(
+        vocab_size=vocab_size, d_model=d_model, n_heads=n_heads,
+        d_ff=d_ff, num_layers=num_layers, dropout=0.1
+    )
     missing, unexpected = encoder.load_state_dict(
         {k.replace("encoder.", ""): v for k, v in state.items() if k.startswith("encoder.")},
         strict=False
     )
     print("Loaded pretrained encoder (missing/unexpected):", missing, unexpected)
 
-    model = Encoder_Only_Transformer(encoder, d_model=128, num_classes=4).to(device)
-
-    # 损失函数和优化器
+    # 分类模型
+    model = Encoder_Only_Transformer(encoder, d_model=d_model, num_classes=num_classes).to(device)
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    
-    print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
-    
-    # 训练模型
-    history, config = train(model, train_loader, test_loader, tokenizer, criterion, optimizer, device, epochs=20, experiment_name="4头_128维_模型")
-    
-    # 绘制各种图表
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+    print(f"💡 Model params: {sum(p.numel() for p in model.parameters()):,}")
+    print(f"🚀 开始训练 {experiment_name}")
+
+    history, config_log = train(
+        model=model,
+        train_loader=train_loader,
+        test_loader=test_loader,
+        tokenizer=tokenizer,
+        criterion=criterion,
+        optimizer=optimizer,
+        device=device,
+        epochs=epochs,
+        experiment_name=experiment_name,
+        model_save_dir="./save/model/sft",
+        results_save_dir="./results/sft"
+    )
+
+    # 绘制结果
     results_dir = "./results/sft"
-    
-    # 绘制批次损失
     plot_batch_loss(
         history_dict=os.path.join(results_dir, 'training_curves.json'),
-        save_path=os.path.join(results_dir, 'batch_loss.png'),
+        save_path=os.path.join(results_dir, f'{experiment_name}_batch_loss.png'),
         smoothing=0.95
     )
-    
-    # 绘制epoch指标
     plot_epoch_metrics(
         history_dict=os.path.join(results_dir, 'training_curves.json'),
-        save_path=os.path.join(results_dir, 'epoch_metrics.png')
+        save_path=os.path.join(results_dir, f'{experiment_name}_epoch_metrics.png')
     )
-    
-    # 绘制样本预测
     plot_sample_predictions(
         model=model,
         data_loader=test_loader,
         tokenizer=tokenizer,
         device=device,
         num_samples=3,
-        save_path=os.path.join(results_dir, 'sample_predictions.png')
+        save_path=os.path.join(results_dir, f'{experiment_name}_sample_predictions.png')
     )
-    
-    print("Training and visualization completed!")
 
-if __name__ == '__main__':
-    main()
+    print("✅ Fine-tuning completed!")
+
+import argparse
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Fine-tune Transformer classifier with pre-trained encoder")
+    parser.add_argument("--config", type=str, default="./config/sft_config.yaml", help="Path to YAML config file")
+    parser.add_argument("--load_local", action="store_true", help="Load local dataset instead of HuggingFace")
+    args = parser.parse_args()
+
+    set_seed()
+    main_with_config(config_path=args.config, load_local=args.load_local)

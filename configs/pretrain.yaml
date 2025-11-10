@@ -1,0 +1,20 @@
+experiment_name: "mlm_pretraining"
+dataset_name: "wikitext"
+
+# 模型参数
+d_model: 128
+n_heads: 4
+d_ff: 512
+num_layers: 2
+
+# 训练参数
+batch_size: 128
+epochs: 30
+learning_rate: 0.001
+warmup_steps: 1000
+max_length: 128
+mlm_prob: 0.15
+
+# 设备配置
+device: "cuda:0"
+seed: 42

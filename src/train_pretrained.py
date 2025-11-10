@@ -8,10 +8,12 @@ from tqdm import tqdm
 import math
 import os
 import json
+import yaml 
 from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import random
 
 def get_tokenizer(datasets_name):
     tokenizer_src = Tokenizer.from_file(f"./datasets/tokenizer/{datasets_name}_tokenizer.json")
@@ -402,46 +404,36 @@ def train_mlm_with_scheduler(model, train_loader, val_loader, tokenizer, optimiz
     print(f"训练完成! 所有文件已保存至指定目录")
     return training_history
 
-def main_with_scheduler(load_local=False):
+# ============================ 加载配置部分 ============================
+def load_config(config_path: str):
+    """从 YAML 文件加载训练配置"""
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f)
+    print(f"配置文件已加载: {config_path}")
+    return config
+
+# ============================ 主训练函数修改 ============================
+def main_with_scheduler(config_path='./config/config.yaml', load_local=False):
     from transformer_h import Encoder_Only_MLM
     
-    # 实验配置
-    experiment_name = "mlm_pretraining"
+    # 读取配置
+    config = load_config(config_path)
+    experiment_name = config.get('experiment_name', 'mlm_pretraining')
     
-    # 创建目录 - 使用简化的目录结构
+    # 创建目录
     save_dirs = create_experiment_dirs()
-    
-    # 训练配置
-    config = {
-        'experiment_name': experiment_name,
-        'd_model': 128,
-        'n_heads': 4,
-        'd_ff': 512,
-        'num_layers': 2,
-        'batch_size': 128,
-        'epochs': 30,
-        'learning_rate': 1e-2,
-        'warmup_steps': 1000,
-        'max_length': 128,
-        'mlm_prob': 0.15
-    }
-    
-    # 保存配置到results目录
     save_training_config(config, save_dirs['results'])
     
     # 加载数据
-    tokenizer = get_tokenizer('wikitext')
-    
-    print("Loading wikitext dataset...")
+    tokenizer = get_tokenizer(config['dataset_name'])
+    print(f"Loading {config['dataset_name']} dataset...")
+
     if load_local:
-        train_texts = []
-        val_texts = []
-        
+        train_texts, val_texts = [], []
         with open('./datasets/wikitext_train.json', 'r', encoding='utf-8') as f:
             for line in f:
                 data = json.loads(line.strip())
                 train_texts.append(data["text"])
-        
         with open('./datasets/wikitext_validation.json', 'r', encoding='utf-8') as f:
             for line in f:
                 data = json.loads(line.strip())
@@ -451,17 +443,17 @@ def main_with_scheduler(load_local=False):
         train_texts = datasets["train"]["text"]
         val_texts = datasets["validation"]["text"]
     
-    # 创建训练集和验证集
-    train_dataset = MLMDataset([t for t in train_texts if t and t.strip()], tokenizer, 
+    # 创建 Dataset / DataLoader
+    train_dataset = MLMDataset(train_texts, tokenizer, 
                               max_length=config['max_length'], mlm_prob=config['mlm_prob'])
-    val_dataset = MLMDataset([t for t in val_texts if t and t.strip()], tokenizer, 
+    val_dataset = MLMDataset(val_texts, tokenizer, 
                             max_length=config['max_length'], mlm_prob=config['mlm_prob'])
     
     train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, drop_last=True)
     val_loader = DataLoader(val_dataset, batch_size=config['batch_size'], shuffle=False)
     
     vocab_size = tokenizer.get_vocab_size()
-    device = torch.device("cuda:7")
+    device = torch.device(config['device'])
     print("Vocab size:", vocab_size, "device:", device)
     
     # 创建模型
@@ -473,48 +465,44 @@ def main_with_scheduler(load_local=False):
         num_layers=config['num_layers']
     ).to(device)
     
-    # 创建优化器和调度器
     optimizer = torch.optim.AdamW(model.parameters(), lr=config['learning_rate'], betas=(0.9, 0.98), eps=1e-9)
     scheduler = TransformerLRScheduler(optimizer, d_model=config['d_model'], warmup_steps=config['warmup_steps'])
-    
     criterion = nn.CrossEntropyLoss(ignore_index=-100)
     
-    # 训练模型
     print("开始训练MLM模型...")
     training_history = train_mlm_with_scheduler(
         model, train_loader, val_loader, tokenizer, optimizer, scheduler, 
         criterion, device, config['epochs'], save_dirs, experiment_name
     )
     
-    # 绘制训练指标并保存到results目录
     plot_mlm_training_metrics(training_history, save_dirs['results'], experiment_name)
-    
     return training_history, save_dirs
 
-import random
+# ============================ 固定随机种子 ============================
 def set_seed(seed=42):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # for multi-GPU setups
-
-    # 确保 cudnn 使用确定性算法
+    torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
-    # 关闭部分非确定性算子
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
     torch.use_deterministic_algorithms(True, warn_only=True)
-
     print(f"[Seed fixed to {seed}]")
 
+import argparse
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="MLM Pretraining with Transformer Scheduler")
+    parser.add_argument("--config", type=str, default="./config/config.yaml",
+                        help="Path to YAML config file (default: ./config/config.yaml)")
+    parser.add_argument("--load_local", action="store_true",
+                        help="Load local dataset JSON instead of HuggingFace dataset")
+    args = parser.parse_args()
+
+    # 固定随机种子
     set_seed()
-    # 使用学习率调度器和完整保存功能训练模型
-    history, dirs = main_with_scheduler()
-    
-    # 或者评估已训练的模型
-    # device = torch.device("cuda:0")
-    # tokenizer = get_tokenizer('wikitext')
-    # metrics = evaluate_pretrained_mlm("encoder_only_mlm_pretrained.pt", tokenizer, device)
+
+    # 运行训练
+    history, dirs = main_with_scheduler(config_path=args.config, load_local=args.load_local)

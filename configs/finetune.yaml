@@ -1,0 +1,22 @@
+experiment_name: "sft_agnews_finetune"
+
+# 数据集与模型路径
+dataset_name: "ag_news"
+pretrained_path: "./save/model/MLM/best_model.pth"
+
+# 模型参数
+d_model: 128
+n_heads: 4
+d_ff: 512
+num_layers: 2
+num_classes: 4
+
+# 训练参数
+batch_size: 128
+test_batch_size: 32
+epochs: 20
+learning_rate: 0.0001
+
+# 设备配置
+device: "cuda:0"
+seed: 42
