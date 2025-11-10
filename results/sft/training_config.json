@@ -1,0 +1,15 @@
+{
+    "experiment_name": "4头_128维_模型",
+    "start_time": "2025-11-09T18:52:36.988787",
+    "epochs": 20,
+    "device": "cuda:7",
+    "optimizer": "Adam",
+    "criterion": "CrossEntropyLoss",
+    "end_time": "2025-11-09T19:01:04.854024",
+    "total_training_time": 506.640315,
+    "best_epoch": 7,
+    "best_test_loss": 0.2733001017927372,
+    "best_test_accuracy": 0.9077631578947368,
+    "final_epoch": 20,
+    "total_batches": 18760
+}

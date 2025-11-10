@@ -8,6 +8,7 @@ tokenizers
 
 # === 数据处理 ===
 numpy>=1.24.0
+nltk==3.9.2
 # pandas>=2.0.0
 # scikit-learn>=1.2.0
 # Pillow>=9.5.0
@@ -24,7 +25,7 @@ pyyaml>=6.0
 
 # === 可视化 ===
 matplotlib>=3.7.0
-# seaborn>=0.12.0
+seaborn>=0.12.0
 # wandb>=0.15.0
 
 # === 开发工具 ===

@@ -110,7 +110,6 @@ class Position_wise_Feed_Forward_Net(nn.Module):
 class Add_Norm(nn.Module):
     def __init__(self, d_model, dropout=0.1):
         super(Add_Norm, self).__init__()
-        # 层归一化
         self.norm = nn.LayerNorm(d_model)
         self.dropout = nn.Dropout(dropout)
 
@@ -204,15 +203,41 @@ class Decoder(nn.Module):
         
         return self.last_norm(tgt_layer)
 
-class Encoder_Only_Transformer(nn.Module):
-    def __init__(self, src_vocab, num_classes, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1):
-        super(Encoder_Only_Transformer, self).__init__()
+class Encoder_Only_MLM(nn.Module):
+    def __init__(self, src_vocab, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1):
+        super(Encoder_Only_MLM, self).__init__()
 
         self.encoder = Encoder(src_vocab, d_model, n_heads, d_ff, num_layers, dropout)
 
-        self.fc = nn.Linear(d_model, num_classes)
+        self.mlm_head = nn.Linear(d_model, src_vocab)
 
         self._init_parameters()
+
+    def _init_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+
+    def forward(self, src, src_mask):
+        output = self.encoder(src, src_mask)
+        logits = self.mlm_head(output)
+
+        return logits
+    
+class Encoder_Only_Transformer(nn.Module):
+    # def __init__(self, src_vocab, num_classes, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1):
+    #     super(Encoder_Only_Transformer, self).__init__()
+
+    #     self.encoder = Encoder(src_vocab, d_model, n_heads, d_ff, num_layers, dropout)
+
+    #     self.fc = nn.Linear(d_model, num_classes)
+
+    #     self._init_parameters()
+
+    def __init__(self, encoder, d_model, num_classes):
+        super().__init__()
+        self.encoder = encoder
+        self.fc = nn.Linear(d_model, num_classes)
 
     def _init_parameters(self):
         for p in self.parameters():
@@ -226,7 +251,6 @@ class Encoder_Only_Transformer(nn.Module):
 
         return out
 
-
 class Encoder_Decoder_Transformer(nn.Module):
     def __init__(self, src_vocab, tgt_vocab, d_model=128, n_heads=4, d_ff=512, num_layers=2, dropout=0.1):
         super(Encoder_Decoder_Transformer, self).__init__()
@@ -234,7 +258,7 @@ class Encoder_Decoder_Transformer(nn.Module):
         self.encoder = Encoder(src_vocab, d_model, n_heads, d_ff, num_layers, dropout)
         self.decoder = Decoder(tgt_vocab, d_model, n_heads, d_ff, num_layers, dropout)
 
-        self.output_linear = nn.Linear(d_model, tgt_vocab)
+        self.generator = nn.Linear(d_model, tgt_vocab)
 
         self._init_parameters()
 
@@ -247,7 +271,7 @@ class Encoder_Decoder_Transformer(nn.Module):
         encoder_output = self.encoder(src, src_mask)
         decoder_output = self.decoder(tgt, encoder_output, tgt_mask, memory_mask)
 
-        logits = self.output_linear(decoder_output)
+        logits = self.generator(decoder_output)
 
         return logits
 

@@ -1,0 +1,24 @@
+{
+    "best_by_bleu": {
+        "epoch": 32,
+        "eval_loss": 2.330457909901937,
+        "ppl": 10.282648981954436,
+        "bleu": 0.13008978017193265,
+        "model_path": "models_new1/checkpoint_epoch_32.pth"
+    },
+    "best_by_loss": {
+        "epoch": 28,
+        "eval_loss": 2.327214006582896,
+        "ppl": 10.249347106028976,
+        "bleu": 0.10011713555796939,
+        "model_path": "models_new1/checkpoint_epoch_28.pth"
+    },
+    "best_by_ppl": {
+        "epoch": 28,
+        "eval_loss": 2.327214006582896,
+        "ppl": 10.249347106028976,
+        "bleu": 0.10011713555796939,
+        "model_path": "models_new1/checkpoint_epoch_28.pth"
+    },
+    "evaluation_timestamp": "2025-11-09T10:35:03.535805"
+}

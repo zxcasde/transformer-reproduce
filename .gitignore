@@ -25,6 +25,7 @@ checkpoints/
 # --- Data and models ---
 data/
 models/
+models_new/
 datasets/
 *.pt
 *.pth

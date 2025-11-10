@@ -1,0 +1,352 @@
+[
+    {
+        "epoch": 1,
+        "eval_loss": 6.274289274215699,
+        "ppl": 530.749030656246,
+        "bleu": 0.000558772213415249,
+        "model_path": "models_new1/checkpoint_epoch_1.pth"
+    },
+    {
+        "epoch": 2,
+        "eval_loss": 5.70821746190389,
+        "ppl": 301.3334509075429,
+        "bleu": 0.002381417773282601,
+        "model_path": "models_new1/checkpoint_epoch_2.pth"
+    },
+    {
+        "epoch": 3,
+        "eval_loss": 5.478760719299316,
+        "ppl": 239.54965408290764,
+        "bleu": 0.004513205466810435,
+        "model_path": "models_new1/checkpoint_epoch_3.pth"
+    },
+    {
+        "epoch": 4,
+        "eval_loss": 5.166839758555095,
+        "ppl": 175.359781641065,
+        "bleu": 0.005768511503964741,
+        "model_path": "models_new1/checkpoint_epoch_4.pth"
+    },
+    {
+        "epoch": 5,
+        "eval_loss": 4.855313348770141,
+        "ppl": 128.42092544976697,
+        "bleu": 0.009108050286262834,
+        "model_path": "models_new1/checkpoint_epoch_5.pth"
+    },
+    {
+        "epoch": 6,
+        "eval_loss": 4.539726463953654,
+        "ppl": 93.6651758131758,
+        "bleu": 0.010092468029652257,
+        "model_path": "models_new1/checkpoint_epoch_6.pth"
+    },
+    {
+        "epoch": 7,
+        "eval_loss": 4.251708277066549,
+        "ppl": 70.22527416428926,
+        "bleu": 0.01374362956509839,
+        "model_path": "models_new1/checkpoint_epoch_7.pth"
+    },
+    {
+        "epoch": 8,
+        "eval_loss": 3.8488930145899456,
+        "ppl": 46.94107137862879,
+        "bleu": 0.024945130520993855,
+        "model_path": "models_new1/checkpoint_epoch_8.pth"
+    },
+    {
+        "epoch": 9,
+        "eval_loss": 3.578308876355489,
+        "ppl": 35.8129255223745,
+        "bleu": 0.026347799835227035,
+        "model_path": "models_new1/checkpoint_epoch_9.pth"
+    },
+    {
+        "epoch": 10,
+        "eval_loss": 3.3826997598012287,
+        "ppl": 29.450172274275868,
+        "bleu": 0.043593133013080126,
+        "model_path": "models_new1/checkpoint_epoch_10.pth"
+    },
+    {
+        "epoch": 11,
+        "eval_loss": 3.195892262458801,
+        "ppl": 24.431963693648015,
+        "bleu": 0.042321140824330646,
+        "model_path": "models_new1/checkpoint_epoch_11.pth"
+    },
+    {
+        "epoch": 12,
+        "eval_loss": 3.02566602230072,
+        "ppl": 20.60772534621208,
+        "bleu": 0.041500491145514115,
+        "model_path": "models_new1/checkpoint_epoch_12.pth"
+    },
+    {
+        "epoch": 13,
+        "eval_loss": 2.8772485335667928,
+        "ppl": 17.76532517520241,
+        "bleu": 0.05880178839845803,
+        "model_path": "models_new1/checkpoint_epoch_13.pth"
+    },
+    {
+        "epoch": 14,
+        "eval_loss": 2.774783237775167,
+        "ppl": 16.035150803951957,
+        "bleu": 0.07117033557135845,
+        "model_path": "models_new1/checkpoint_epoch_14.pth"
+    },
+    {
+        "epoch": 15,
+        "eval_loss": 2.675381513436635,
+        "ppl": 14.517887552340612,
+        "bleu": 0.07109289459753128,
+        "model_path": "models_new1/checkpoint_epoch_15.pth"
+    },
+    {
+        "epoch": 16,
+        "eval_loss": 2.6094222823778788,
+        "ppl": 13.591196709466374,
+        "bleu": 0.0754872908679242,
+        "model_path": "models_new1/checkpoint_epoch_16.pth"
+    },
+    {
+        "epoch": 17,
+        "eval_loss": 2.5552363793055215,
+        "ppl": 12.87434252601775,
+        "bleu": 0.08329829632940408,
+        "model_path": "models_new1/checkpoint_epoch_17.pth"
+    },
+    {
+        "epoch": 18,
+        "eval_loss": 2.5114198684692384,
+        "ppl": 12.322413852124416,
+        "bleu": 0.08811215040361638,
+        "model_path": "models_new1/checkpoint_epoch_18.pth"
+    },
+    {
+        "epoch": 19,
+        "eval_loss": 2.476368510723114,
+        "ppl": 11.897978487928592,
+        "bleu": 0.08242264603571292,
+        "model_path": "models_new1/checkpoint_epoch_19.pth"
+    },
+    {
+        "epoch": 20,
+        "eval_loss": 2.4574755787849427,
+        "ppl": 11.675300929688285,
+        "bleu": 0.08254028069208634,
+        "model_path": "models_new1/checkpoint_epoch_20.pth"
+    },
+    {
+        "epoch": 21,
+        "eval_loss": 2.4127233465512594,
+        "ppl": 11.164324105417387,
+        "bleu": 0.09643981544658183,
+        "model_path": "models_new1/checkpoint_epoch_21.pth"
+    },
+    {
+        "epoch": 22,
+        "eval_loss": 2.392065966129303,
+        "ppl": 10.93606415850311,
+        "bleu": 0.09395689081317175,
+        "model_path": "models_new1/checkpoint_epoch_22.pth"
+    },
+    {
+        "epoch": 23,
+        "eval_loss": 2.3701844175656634,
+        "ppl": 10.699365253074511,
+        "bleu": 0.09565006741322273,
+        "model_path": "models_new1/checkpoint_epoch_23.pth"
+    },
+    {
+        "epoch": 24,
+        "eval_loss": 2.364873774846395,
+        "ppl": 10.642695356866335,
+        "bleu": 0.09240315063378515,
+        "model_path": "models_new1/checkpoint_epoch_24.pth"
+    },
+    {
+        "epoch": 25,
+        "eval_loss": 2.34618456363678,
+        "ppl": 10.44563892586299,
+        "bleu": 0.09957425986332161,
+        "model_path": "models_new1/checkpoint_epoch_25.pth"
+    },
+    {
+        "epoch": 26,
+        "eval_loss": 2.3466612219810488,
+        "ppl": 10.45061911364796,
+        "bleu": 0.104702498494645,
+        "model_path": "models_new1/checkpoint_epoch_26.pth"
+    },
+    {
+        "epoch": 27,
+        "eval_loss": 2.3444177230199177,
+        "ppl": 10.42719944135171,
+        "bleu": 0.11220745197513042,
+        "model_path": "models_new1/checkpoint_epoch_27.pth"
+    },
+    {
+        "epoch": 28,
+        "eval_loss": 2.327214006582896,
+        "ppl": 10.249347106028976,
+        "bleu": 0.10011713555796939,
+        "model_path": "models_new1/checkpoint_epoch_28.pth"
+    },
+    {
+        "epoch": 29,
+        "eval_loss": 2.331108236312866,
+        "ppl": 10.289338235024932,
+        "bleu": 0.1059802049642795,
+        "model_path": "models_new1/checkpoint_epoch_29.pth"
+    },
+    {
+        "epoch": 30,
+        "eval_loss": 2.337605885664622,
+        "ppl": 10.356412423229397,
+        "bleu": 0.10533784191424492,
+        "model_path": "models_new1/checkpoint_epoch_30.pth"
+    },
+    {
+        "epoch": 31,
+        "eval_loss": 2.3406211972236632,
+        "ppl": 10.387687361464497,
+        "bleu": 0.11140945107729974,
+        "model_path": "models_new1/checkpoint_epoch_31.pth"
+    },
+    {
+        "epoch": 32,
+        "eval_loss": 2.330457909901937,
+        "ppl": 10.282648981954436,
+        "bleu": 0.13008978017193265,
+        "model_path": "models_new1/checkpoint_epoch_32.pth"
+    },
+    {
+        "epoch": 33,
+        "eval_loss": 2.344819108645121,
+        "ppl": 10.431385609396234,
+        "bleu": 0.129325422389594,
+        "model_path": "models_new1/checkpoint_epoch_33.pth"
+    },
+    {
+        "epoch": 34,
+        "eval_loss": 2.349750542640686,
+        "ppl": 10.482954348419137,
+        "bleu": 0.10781000133658748,
+        "model_path": "models_new1/checkpoint_epoch_34.pth"
+    },
+    {
+        "epoch": 35,
+        "eval_loss": 2.3441840132077534,
+        "ppl": 10.424762787274945,
+        "bleu": 0.11360047192585938,
+        "model_path": "models_new1/checkpoint_epoch_35.pth"
+    },
+    {
+        "epoch": 36,
+        "eval_loss": 2.360383669535319,
+        "ppl": 10.595015657462092,
+        "bleu": 0.11364480754588419,
+        "model_path": "models_new1/checkpoint_epoch_36.pth"
+    },
+    {
+        "epoch": 37,
+        "eval_loss": 2.3607283512751263,
+        "ppl": 10.598668195337586,
+        "bleu": 0.10692044294875909,
+        "model_path": "models_new1/checkpoint_epoch_37.pth"
+    },
+    {
+        "epoch": 38,
+        "eval_loss": 2.3741724530855817,
+        "ppl": 10.742119898601187,
+        "bleu": 0.09951975938279592,
+        "model_path": "models_new1/checkpoint_epoch_38.pth"
+    },
+    {
+        "epoch": 39,
+        "eval_loss": 2.3818193395932514,
+        "ppl": 10.824578544457944,
+        "bleu": 0.11123709770183801,
+        "model_path": "models_new1/checkpoint_epoch_39.pth"
+    },
+    {
+        "epoch": 40,
+        "eval_loss": 2.383840545018514,
+        "ppl": 10.846479366912867,
+        "bleu": 0.11839676671339787,
+        "model_path": "models_new1/checkpoint_epoch_40.pth"
+    },
+    {
+        "epoch": 41,
+        "eval_loss": 2.397601481278737,
+        "ppl": 10.99676876796156,
+        "bleu": 0.11897929174808645,
+        "model_path": "models_new1/checkpoint_epoch_41.pth"
+    },
+    {
+        "epoch": 42,
+        "eval_loss": 2.4019857962926228,
+        "ppl": 11.045087912149754,
+        "bleu": 0.10116974085655556,
+        "model_path": "models_new1/checkpoint_epoch_42.pth"
+    },
+    {
+        "epoch": 43,
+        "eval_loss": 2.410271652539571,
+        "ppl": 11.13698612473895,
+        "bleu": 0.10329669676919781,
+        "model_path": "models_new1/checkpoint_epoch_43.pth"
+    },
+    {
+        "epoch": 44,
+        "eval_loss": 2.424844177563985,
+        "ppl": 11.300468415564577,
+        "bleu": 0.1163221948525895,
+        "model_path": "models_new1/checkpoint_epoch_44.pth"
+    },
+    {
+        "epoch": 45,
+        "eval_loss": 2.4425096035003664,
+        "ppl": 11.501869685479882,
+        "bleu": 0.10463825358450282,
+        "model_path": "models_new1/checkpoint_epoch_45.pth"
+    },
+    {
+        "epoch": 46,
+        "eval_loss": 2.448568308353424,
+        "ppl": 11.571767650916552,
+        "bleu": 0.11430225494905717,
+        "model_path": "models_new1/checkpoint_epoch_46.pth"
+    },
+    {
+        "epoch": 47,
+        "eval_loss": 2.4688058853149415,
+        "ppl": 11.808337919765366,
+        "bleu": 0.10587072179048637,
+        "model_path": "models_new1/checkpoint_epoch_47.pth"
+    },
+    {
+        "epoch": 48,
+        "eval_loss": 2.4612223068873087,
+        "ppl": 11.719127158998349,
+        "bleu": 0.11991523715252769,
+        "model_path": "models_new1/checkpoint_epoch_48.pth"
+    },
+    {
+        "epoch": 49,
+        "eval_loss": 2.4957037885983784,
+        "ppl": 12.130267659195574,
+        "bleu": 0.10643368306482273,
+        "model_path": "models_new1/checkpoint_epoch_49.pth"
+    },
+    {
+        "epoch": 50,
+        "eval_loss": 2.5077786525090535,
+        "ppl": 12.277626871156844,
+        "bleu": 0.10646297555829158,
+        "model_path": "models_new1/checkpoint_epoch_50.pth"
+    }
+]
