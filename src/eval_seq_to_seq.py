@@ -15,21 +15,42 @@ import math
 import argparse
 from pathlib import Path
 
-def get_tokenizer_data(dataset_name=''):
-    tokenizer_src = Tokenizer.from_file("src/src_tokenizer.json")
-    tokenizer_tgt = Tokenizer.from_file("src/tgt_tokenizer.json")
-
-    dataset = load_dataset("IWSLT/iwslt2017", "iwslt2017-en-de", cache_dir='/data/yangguang/LLM/data')
-
+def load_iwslt_from_json(dir_path):
     corpus_src_train, corpus_tgt_train = [], []
-    for item in dataset['train']['translation']:
-        corpus_src_train.append(item['en'])
-        corpus_tgt_train.append(item['de'])
-
     corpus_src_test, corpus_tgt_test = [], []
-    for item in dataset['test']['translation']:
-        corpus_src_test.append(item['en'])
-        corpus_tgt_test.append(item['de'])
+    
+    with open(f'{dir_path}/iwslt_train.json', 'r', encoding='utf-8') as f:
+        for line in f:
+            data = json.loads(line.strip())
+            corpus_src_train.append(data["en"])
+            corpus_tgt_train.append(data["de"])
+    
+    with open(f'{dir_path}/iwslt_test.json', 'r', encoding='utf-8') as f:
+        for line in f:
+            data = json.loads(line.strip())
+            corpus_src_test.append(data["en"])
+            corpus_tgt_test.append(data["de"])
+    
+    return corpus_src_train, corpus_tgt_train, corpus_src_test, corpus_tgt_test
+
+def get_tokenizer_data(dir_path='./datasets', load_with_local_json=False):
+    tokenizer_src = Tokenizer.from_file(f"{dir_path}/tokenizer/src_tokenizer.json")
+    tokenizer_tgt = Tokenizer.from_file(f"{dir_path}/tokenizer/tgt_tokenizer.json")
+
+    if load_with_local_json:
+        corpus_src_train, corpus_tgt_train, corpus_src_test, corpus_tgt_test = load_iwslt_from_json(dir_path)
+    else:
+        dataset = load_dataset("IWSLT/iwslt2017", "iwslt2017-en-de", cache_dir='./data')
+
+        corpus_src_train, corpus_tgt_train = [], []
+        for item in dataset['train']['translation']:
+            corpus_src_train.append(item['en'])
+            corpus_tgt_train.append(item['de'])
+
+        corpus_src_test, corpus_tgt_test = [], []
+        for item in dataset['test']['translation']:
+            corpus_src_test.append(item['en'])
+            corpus_tgt_test.append(item['de'])
 
     return tokenizer_src, tokenizer_tgt, corpus_src_train, corpus_tgt_train, corpus_src_test, corpus_tgt_test
 

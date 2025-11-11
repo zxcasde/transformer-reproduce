@@ -13,11 +13,11 @@ num_layers: 4
 dropout: 0.1
 
 # 优化器与学习率
-base_lr: 1.0
+base_lr: 0.5
 weight_decay: 0.01
 
 # 训练参数
-batch_size: 128
+batch_size: 256
 test_batch_size: 512
 epochs: 50
 device: "cuda:1"
